@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct Football_Star_RateApp: App {
+    
+    @StateObject var viewRouter = ViewRouter()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            BottomTabView(viewRouter: viewRouter)
         }
     }
 }
