@@ -11,7 +11,8 @@ struct MatchDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @ObservedObject var api : ApiManager
-    @State var game: GamesPre
+    @State var game: GamesPre = GamesPre()
+    @State var gameEnd: GamesEnd = GamesEnd()
     @State var homeOd = "N/A"
     @State var awayOd = "N/A"
     @State var drawOd = "N/A"

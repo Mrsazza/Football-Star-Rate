@@ -8,31 +8,36 @@
 import SwiftUI
 
 struct TeamView: View {
-    @StateObject var api:ApiManager
-    
+    @ObservedObject var api:ApiManager
     var body: some View {
         NavigationView{
         ZStack {
             Color.accentColor
             VStack(spacing: 0) {
                 TopBar(tabName: "Team rating")
+                if api.teams.count == 0{
+                    ProgressView("Please wait...")
+                        .foregroundColor(.white)
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .padding()
+                } else {
                 ScrollView {
-                    ForEach(0..<api.root.games_pre.count){ i in
-                        NavigationLink(destination: TeamDetailView(api: api, teamId: api.root.games_pre[i].home.id, name:  api.root.games_pre[i].home.name, cc:  api.root.games_pre[i].home.cc!)){
+                    ForEach(0..<api.teams.count){ i in
+                        NavigationLink(destination: TeamDetailView( api: api, teamId: api.teams[i].id, name: api.teams[i].name, cc: api.teams[i].cc!)){
                             ZStack {
                                 Rectangle()
                                     .foregroundColor( (i % 2 == 0) ? Color.accentColor : Color("DarkBlue"))
                                 .frame(width: nil, height: 90)
                                 
                                 HStack{
-                                    LoadImage(withURL: api.root.games_pre[i].home.id)
+                                    LoadImage(withURL: api.teams[i].id)
                                     
-                                    Text(api.root.games_pre[i].home.name)
+                                    Text(api.teams[i].name)
                                         .foregroundColor(.white)
                                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                                         .padding(.leading,10)
                                     Spacer()
-                                    Text("92%")
+                                    Text("\(api.teams[i].chance)")
                                         .foregroundColor(.white)
                                         .font(.system(size: 18, weight: .semibold, design: .rounded))
                                 }
@@ -41,7 +46,11 @@ struct TeamView: View {
                         }
                     }
                 }
+                }
                 Spacer()
+            }
+            .onChange(of: api.teams.count) { _ in
+                api.getTeam()
             }
             
         }

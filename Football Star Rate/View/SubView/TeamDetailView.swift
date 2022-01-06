@@ -60,6 +60,9 @@ struct TeamDetailView: View {
                                     if (api.teamOddArr.contains(where: {$0.gameId == match.game_id})){
                                         MainViewList(homeTeam: match.home.name, awayTeam: match.away.name,homeOd: api.teamOddArr[api.teamOddArr.firstIndex(where: {$0.gameId == match.game_id})!].homeOd,awayOd: api.teamOddArr[api.teamOddArr.firstIndex(where: {$0.gameId == match.game_id})!].awayOd)
                                     }
+                                    else{
+                                        MainViewList(homeTeam: match.home.name, awayTeam: match.away.name)
+                                    }
                                 }
                             }
                         }
@@ -81,7 +84,6 @@ struct TeamDetailView: View {
         }
         .onAppear{
             api.fetchTeamUpcoming(teamId: teamId)
-            
         }
     }
 }

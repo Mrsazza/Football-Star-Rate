@@ -13,15 +13,16 @@ struct BottomTabView: View {
     @StateObject var api = ApiManager()
     @State var isLoaded = false
     @StateObject var OddsVM = OddsViewModel()
+  //  @StateObject var teamVM = TeamViewModel(api: ApiManager())
   //  @State var root = Root()
   //  @State var odds: [Odds] = []
-    
+    @State var onScreen = false
     var body: some View {
             ZStack(alignment:.bottom) {
                 switch viewRouter.currentPage {
                 case .main:
                     ZStack{
-                        if api.loading || api.againLoading{
+                        if api.loading || api.againLoading {
                             MainView(api: api)
                             ProgressView("Please wait...")
                                 .foregroundColor(.white)
@@ -29,15 +30,30 @@ struct BottomTabView: View {
                         } else {
                             MainView(api: api)
                                 .onAppear{
-                                    api.fetchOdd(gamesPre: api.root.games_pre)
+                                    isLoaded = true
+                                    if api.isPast {
+                                        api.fetchPastOdd(gamesEnd: api.completedRoot.games_end)
+                                    } else {
+                                        api.fetchOdd(gamesPre: api.root.games_pre)
+                                    }
                                    // print(api.oddRoot)
+                                    api.getTeam()
+                                    onScreen = false
                                 }
                         }
                     }
                 case .team:
                     TeamView(api: api)
+                        .onAppear{
+                            onScreen = true
+                            api.getTeam()
+                        }
+                       
                 case .favorite:
                     FavoriteView(api: api)
+                        .onAppear {
+                            onScreen = true
+                        }
                  }
                 VStack(){
                     Spacer()
@@ -45,7 +61,9 @@ struct BottomTabView: View {
                 }
             }.edgesIgnoringSafeArea(.bottom)
             .onAppear(){
-                api.fetchSource(date: api.apiDate(date: Date()))
+                if !isLoaded{
+                    api.fetchSource(date: api.apiDate(date: Date()))
+                }
             }
         }
 }
@@ -54,7 +72,7 @@ struct BottomTabView: View {
 struct BottomTabView_Previews: PreviewProvider {
     static var previews: some View {
         BottomTabView(viewRouter: ViewRouter())
-            .previewInterfaceOrientation(.portrait)
+           // .previewInterfaceOrientation(.portrait)
             
     }
 }
