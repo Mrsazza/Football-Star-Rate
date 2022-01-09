@@ -39,23 +39,23 @@ struct MatchDetailView: View {
                     HStack{
                         Spacer()
                             .frame(width:40)
-                        NavigationLink(destination: TeamDetailView(api: api, teamId: game.home.id, name: game.home.name,cc: game.home.cc!)) {
-                            Team(withURL: game.home.id,name: game.home.name)
+                        NavigationLink(destination: TeamDetailView(api: api, teamId: api.isPast ? gameEnd.home.id : game.home.id, name: api.isPast ? gameEnd.home.name : game.home.name,cc: api.isPast ? gameEnd.home.cc! : game.home.cc!)) {
+                            Team(withURL: api.isPast ? gameEnd.home.id : game.home.id,name: api.isPast ? gameEnd.home.name : game.home.name)
                         }
                         Spacer()
                             .frame(width:30)
                         VStack(spacing: 10){
-                            Text(gameDate(time: game.time))
+                            Text(gameDate(time: api.isPast ? gameEnd.time : game.time))
                                 .foregroundColor(.white)
                                 .font(.system(size: 18, weight: .semibold, design: .rounded))
-                            Text(gameTime(time: game.time))
+                            Text(gameTime(time: api.isPast ? gameEnd.time : game.time))
                                 .foregroundColor(Color("Green"))
                                 .font(.system(size: 22, weight: .semibold, design: .rounded))
                         }
                         Spacer()
                             .frame(width:30)
-                        NavigationLink(destination: TeamDetailView(api: api, teamId: game.away.id, name: game.away.name, cc: game.away.cc!)){
-                            Team( withURL: game.away.id, name: game.away.name)
+                        NavigationLink(destination: TeamDetailView(api: api, teamId: api.isPast ? gameEnd.away.id : game.away.id, name: api.isPast ? gameEnd.away.name : game.away.name,cc: api.isPast ? gameEnd.away.cc! : game.away.cc!)) {
+                            Team(withURL: api.isPast ? gameEnd.away.id : game.away.id,name: api.isPast ? gameEnd.away.name : game.away.name)
                         }
                         Spacer()
                             .frame(width:40)

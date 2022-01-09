@@ -27,7 +27,13 @@ struct BottomTabView: View {
                             ProgressView("Please wait...")
                                 .foregroundColor(.white)
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        } else {
+                        }else if onScreen {
+                            MainView(api: api)
+                                .onAppear {
+                                    onScreen = false
+                                }
+                        }
+                        else {
                             MainView(api: api)
                                 .onAppear{
                                     isLoaded = true
@@ -39,20 +45,26 @@ struct BottomTabView: View {
                                    // print(api.oddRoot)
                                     api.getTeam()
                                     onScreen = false
+                                    print(viewRouter.currentPage)
                                 }
                         }
                     }
                 case .team:
                     TeamView(api: api)
+//                        .onChange(of: api.teams.count, perform: { newValue in
+//                            api.getTeam()
+//                        })
                         .onAppear{
                             onScreen = true
                             api.getTeam()
+                            print(viewRouter.currentPage)
                         }
                        
                 case .favorite:
                     FavoriteView(api: api)
                         .onAppear {
                             onScreen = true
+                            print(viewRouter.currentPage)
                         }
                  }
                 VStack(){

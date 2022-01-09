@@ -11,6 +11,7 @@ struct TeamDetailView: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @ObservedObject var api: ApiManager
+    @ObservedObject var teamVM = TeamVM()
     @State var teamId: String
     @State var name: String
     @State var cc: String
@@ -30,7 +31,14 @@ struct TeamDetailView: View {
                         })
                         Spacer()
                         
-                        Image("star")
+                        Image( teamVM.favoriteTeam.contains(where: {$0.id == teamId}) ? "starSelected" : "star")
+                            .onTapGesture {
+                                if (teamVM.favoriteTeam.contains(where: {$0.id == teamId})){
+                                    //
+                                }else {
+                                    teamVM.add(TeamData(name: name, id: teamId, cc: cc))
+                                }
+                            }
                     }
                     .padding()
                 }
@@ -49,6 +57,9 @@ struct TeamDetailView: View {
                             .font(.callout)
                             .padding()
                     } else {
+                       
+                     
+                        
                         ScrollView {
                             if api.oddLoading{
                                 ProgressView("Fetching Odds...")
@@ -66,17 +77,57 @@ struct TeamDetailView: View {
                                 }
                             }
                         }
-                        .frame(height:150)
                         .onAppear{
-                            if api.teamUpcomingRoot.games_pre.count != 0{
-                                api.fetchTeamOdd(gamesPre: api.teamUpcomingRoot.games_pre)
-                            }
-                            print("api count \(api.teamUpcomingRoot.games_pre.count)")
-                        }
+                            // if api.teamUpcomingRoot.games_pre.count != 0{
+                                 api.fetchTeamOdd(gamesPre: api.teamUpcomingRoot.games_pre)
+                             //}
+                            // print("api count \(api.teamOddArr.count)")
+                         }
+                        .frame(height:150)
+                    
                     }
                 }
                 MidlleBar(barName: "Past Matches")
-                PastMatchesList()
+                if api.teamPastLoading{
+                    ProgressView("Fetching Data...")
+                        .foregroundColor(.white)
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .padding()
+                } else{
+//                    Group{
+//                        if api.completedRoot.games_end.isEmpty {
+//                        EmptyView()
+//                      }
+//                    else{
+                ScrollView{
+                    if api.oddPastLoading{
+                        ProgressView("Fetching Matches..")
+                            .foregroundColor(.white)
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .padding()
+                    } else {
+                    ForEach(api.teamPastRoot.games_end, id: \.id){(match) in
+                        if (api.teamPastOddArr.contains(where: {$0.gameId == match.game_id})){
+                            PastMatchesList(homeTeam: match.home.name,
+                                            awayTeam: match.away.name,
+                                            homeOd: api.teamPastOddArr[api.teamPastOddArr.firstIndex(where: {$0.gameId == match.game_id})!].homeOd,
+                                            awayOd: api.teamPastOddArr[api.teamPastOddArr.firstIndex(where: {$0.gameId == match.game_id})!].awayOd,score: match.score)
+                        }
+                        else{
+                            PastMatchesList(homeTeam: match.home.name, awayTeam: match.away.name,score:match.score)
+                        }
+                    }
+                }
+                    
+                }
+                .onAppear {
+                    api.fetchTeamPastOdd(gamesEnd: api.teamPastRoot.games_end)
+                }
+//                }
+//
+//            }
+            }
+                
                 Spacer()
             }
             .navigationBarTitle("")
@@ -84,6 +135,7 @@ struct TeamDetailView: View {
         }
         .onAppear{
             api.fetchTeamUpcoming(teamId: teamId)
+            api.fetchTeamPast(teamId: teamId)
         }
     }
 }

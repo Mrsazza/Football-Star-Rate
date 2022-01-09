@@ -8,14 +8,34 @@
 import Foundation
 import SwiftUI
 
-class TeamViewModel:ObservableObject{
-    
-    //var team:TeamData = TeamData()
-    @ObservedObject var api: ApiManager
-    init(api : ApiManager){
-        self.api = api
-        //getTeam()
+
+class TeamVM: ObservableObject{
+    @Published var favoriteTeam : [TeamData]
+    let saveKey = "SavedData"
+    init() {
+        if let data = UserDefaults.standard.data(forKey: saveKey) {
+            if let decoded = try? JSONDecoder().decode([TeamData].self, from: data) {
+                favoriteTeam = decoded
+                return
+            }
+        }
+
+        favoriteTeam = []
     }
- 
- 
+    
+    func save() {
+        if let encoded = try? JSONEncoder().encode(favoriteTeam) {
+            UserDefaults.standard.set(encoded, forKey: saveKey)
+        }
+    }
+    
+    func add(_ team: TeamData) {
+        favoriteTeam.append(team)
+        save()
+    }
+    
+    func removeRows(at offsets: IndexSet) {
+        favoriteTeam.remove(atOffsets: offsets)
+        save()
+    }
 }

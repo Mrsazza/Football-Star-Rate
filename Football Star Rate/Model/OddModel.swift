@@ -7,17 +7,7 @@
 
 import Foundation
 
-//public class Prematch
-//{
-//public string home_od { get; set; }
-//public string draw_od { get; set; }
-//public string away_od { get; set; }
-//public string ss { get; set; }
-//public string add_time { get; set; }
-//public string handicap { get; set; }
-//public string over_od { get; set; }
-//public string under_od { get; set; }
-//}
+
 struct Prematch: Codable, Identifiable{
     let id = UUID().uuidString
     
@@ -31,17 +21,6 @@ struct Prematch: Codable, Identifiable{
     var under_od:String? = ""
 }
 
-//public class Kickoff
-//{
-//public string home_od { get; set; }
-//public string draw_od { get; set; }
-//public string away_od { get; set; }
-//public string ss { get; set; }
-//public string add_time { get; set; }
-//public string handicap { get; set; }
-//public string over_od { get; set; }
-//public string under_od { get; set; }
-//}
 
 struct Kickoff:Codable, Identifiable{
     let id = UUID().uuidString
@@ -56,17 +35,6 @@ struct Kickoff:Codable, Identifiable{
     var under_od:String? = ""
 }
 
-//public class Live
-//{
-//public string home_od { get; set; }
-//public string draw_od { get; set; }
-//public string away_od { get; set; }
-//public string ss { get; set; }
-//public string add_time { get; set; }
-//public string handicap { get; set; }
-//public string over_od { get; set; }
-//public string under_od { get; set; }
-//}
 
 struct Live:Codable,Identifiable{
     let id = UUID().uuidString
@@ -124,16 +92,6 @@ struct Odds:Codable, Identifiable{
     var Bet365:Bet3657? = Bet3657()
 }
 
-
-//public class Root
-//{
-//public double time_request { get; set; }
-//public string capacity_requests { get; set; }
-//public string remain_requests { get; set; }
-//public string last_time_your_key { get; set; }
-//public string game_id { get; set; }
-//public Odds odds { get; set; }
-//}
 
 struct OddRoot:Codable, Identifiable{
     let id = UUID().uuidString

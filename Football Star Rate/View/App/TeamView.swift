@@ -22,7 +22,7 @@ struct TeamView: View {
                         .padding()
                 } else {
                 ScrollView {
-                    ForEach(0..<api.teams.count){ i in
+                    ForEach(0..<api.teams.count, id: \.self){ i in
                         NavigationLink(destination: TeamDetailView( api: api, teamId: api.teams[i].id, name: api.teams[i].name, cc: api.teams[i].cc!)){
                             ZStack {
                                 Rectangle()
@@ -45,13 +45,14 @@ struct TeamView: View {
                             }
                         }
                     }
+//                    .onChange(of: api.teams.count) { _ in
+//                        api.getTeam()
+//                    }
                 }
                 }
                 Spacer()
             }
-            .onChange(of: api.teams.count) { _ in
-                api.getTeam()
-            }
+           
             
         }
         .navigationBarTitle("")

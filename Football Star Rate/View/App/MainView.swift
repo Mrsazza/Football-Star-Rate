@@ -108,7 +108,10 @@ struct MainView: View {
                                     // To filter the team according to selected league
                                     if selectedLeague == match.league.name{
                                         if (api.oddArr.contains(where: {$0.gameId == match.game_id})){
-                                            NavigationLink(destination: MatchDetailView(api:api,gameEnd: match,homeOd: api.oddArr[api.oddArr.firstIndex(where: {$0.gameId == match.game_id})!].homeOd, awayOd: api.oddArr[api.oddArr.firstIndex(where: {$0.gameId == match.game_id})!].awayOd,drawOd: api.oddArr[api.oddArr.firstIndex(where: {$0.gameId == match.game_id})!].drawOd)){
+                                            NavigationLink(destination: MatchDetailView(api:api,
+                                                                                        gameEnd: match,
+                                                                                        homeOd: api.oddArr[api.oddArr.firstIndex(where: {$0.gameId == match.game_id})!].homeOd,
+                                                                                        awayOd: api.oddArr[api.oddArr.firstIndex(where: {$0.gameId == match.game_id})!].awayOd,drawOd: api.oddArr[api.oddArr.firstIndex(where: {$0.gameId == match.game_id})!].drawOd)){
                                                 MainViewList(homeTeam: match.home.name , awayTeam: match.away.name, homeOd: api.oddArr[api.oddArr.firstIndex(where: {$0.gameId == match.game_id})!].homeOd, awayOd: api.oddArr[api.oddArr.firstIndex(where: {$0.gameId == match.game_id})!].awayOd)
                                            
                                         }

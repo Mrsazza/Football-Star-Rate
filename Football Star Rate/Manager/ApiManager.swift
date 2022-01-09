@@ -11,16 +11,24 @@ class ApiManager: ObservableObject{
     @Published var oddRoot = OddRoot()
     @Published var root = Root()
     @Published var completedRoot = CompletedRoot()
+    @Published var teamUpcomingRoot = Root()
+    @Published var teamPastRoot = CompletedRoot()
+    
     @Published var oddLoading = false
     @Published var loading = false
     @Published var againLoading = false
     @Published var teamLoading = false
+    @Published var isPast = false
+    @Published var oddPastLoading = false
+    @Published var teamPastLoading = false
+    
     @Published var oddArr: [NewOdds] = []
     @Published var teamOddArr: [NewOdds] = []
-    @Published var date = Date()
-    @Published var teamUpcomingRoot = Root()
+    @Published var teamPastOddArr: [NewOdds] = []
     @Published var teams: [TeamData] = []
-    @Published var isPast = false
+    
+    @Published var date = Date()
+    
     var login = "ayna"
     var token = "12784-OhJLY5mb3BSOx0O"
    
@@ -30,6 +38,53 @@ class ApiManager: ObservableObject{
         dateFormatter.dateFormat = "yyyyMMdd"
         let day = dateFormatter.string(from: date)
         return "\(day)"
+    }
+    
+    let queue = DispatchQueue.global()
+    var workItem = DispatchWorkItem {
+        //
+    }
+    var session : URLSessionTask?
+    
+    let concurrentQueue = DispatchQueue(label: "queuename", attributes: .concurrent)
+    
+    func loadTeamPast(teamId:String,completion:@escaping (CompletedRoot) -> ()) {
+        guard let url = URL(string: "https://spoyer.ru/api/en/get.php?login=\(login)&token=\(token)&task=enddata&sport=soccer&team=\(teamId)&p=1") else {
+            print("Invalid url...")
+            return
+        }
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data{
+                do{
+                    let teamData = try JSONDecoder().decode(CompletedRoot.self, from: data)
+                    if teamData.games_end.count != 0{
+//                        DispatchQueue.main
+                        DispatchQueue(label: "queue1", attributes: .concurrent).async {
+                            completion(teamData)
+                        }
+                    }
+                  // print(teamData)
+                    
+                }
+//                catch let DecodingError.dataCorrupted(context) {
+//                    print(context)
+//                } catch let DecodingError.keyNotFound(key, context) {
+//                    print("Key '\(key)' not found:", context.debugDescription)
+//                    print("codingPath:", context.codingPath)
+//                } catch let DecodingError.valueNotFound(value, context) {
+//                    print("Value '\(value)' not found:", context.debugDescription)
+//                    print("codingPath:", context.codingPath)
+//                } catch let DecodingError.typeMismatch(type, context)  {
+//                    print("Type '\(type)' mismatch:", context.debugDescription)
+//                    print("codingPath:", context.codingPath)
+//                }
+            catch {
+//                    print("error: ", error)
+                }
+                return
+            }
+        }.resume()
+    
     }
     
     func loadTeamUpcoming(teamId:String,completion:@escaping (Root) -> ()) {
@@ -42,24 +97,27 @@ class ApiManager: ObservableObject{
                 do{
                     let teamData = try JSONDecoder().decode(Root.self, from: data)
                     if teamData.games_pre.count != 0{
-                        DispatchQueue.main.async {
+                       // DispatchQueue.main
+                        DispatchQueue(label: "queue2", attributes: .concurrent).async {
                             completion(teamData)
                         }
                     }
                   // print(teamData)
                     
-                } catch let DecodingError.dataCorrupted(context) {
+                }
+//                catch let DecodingError.dataCorrupted(context) {
 //                    print(context)
-                } catch let DecodingError.keyNotFound(key, context) {
+//                } catch let DecodingError.keyNotFound(key, context) {
 //                    print("Key '\(key)' not found:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.valueNotFound(value, context) {
+//                } catch let DecodingError.valueNotFound(value, context) {
 //                    print("Value '\(value)' not found:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.typeMismatch(type, context)  {
+//                } catch let DecodingError.typeMismatch(type, context)  {
 //                    print("Type '\(type)' mismatch:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch {
+//                }
+                catch {
 //                    print("error: ", error)
                 }
                 return
@@ -73,7 +131,8 @@ class ApiManager: ObservableObject{
             print("Invalid url...")
             return
         }
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        self.workItem.cancel();self.session?.cancel()
+        workItem = DispatchWorkItem{ let task = URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data{
                 do{
                     let matchData = try JSONDecoder().decode(Root.self, from: data)
@@ -84,18 +143,20 @@ class ApiManager: ObservableObject{
                     }
                   // print(teamData)
                     
-                } catch let DecodingError.dataCorrupted(context) {
+                }
+//                catch let DecodingError.dataCorrupted(context) {
                    // print(context)
-                } catch let DecodingError.keyNotFound(key, context) {
+//                } catch let DecodingError.keyNotFound(key, context) {
 //                    print("Key '\(key)' not found:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.valueNotFound(value, context) {
+//                } catch let DecodingError.valueNotFound(value, context) {
 //                    print("Value '\(value)' not found:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.typeMismatch(type, context)  {
+//                } catch let DecodingError.typeMismatch(type, context)  {
 //                    print("Type '\(type)' mismatch:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch {
+//                }
+            catch {
 //                    print("error: ", error)
                 }
                 return
@@ -104,7 +165,16 @@ class ApiManager: ObservableObject{
 //            DispatchQueue.main.async {
 //                completion(matchData)
 //            }
-        }.resume()
+        }
+//        .resume()
+            task.resume()
+            self.session = task
+        }
+            
+//        }
+        DispatchQueue.global().async(execute: workItem)
+        
+      // workItem
     }
     
     func loadCompletedMatchData(date:String,completion:@escaping (CompletedRoot) -> ()) {
@@ -112,30 +182,44 @@ class ApiManager: ObservableObject{
             print("Invalid url...")
             return
         }
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        
+        self.workItem.cancel();self.session?.cancel()
+        
+//        DispatchQueue.global().async {
+//            self.session.suspend()
+//            self.workItem.cancel()
+//
+//            print("D1")
+//        }
+        
+        workItem = DispatchWorkItem{ URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data{
                 do{
                     let matchData = try JSONDecoder().decode(CompletedRoot.self, from: data)
                     if matchData.games_end.count != 0{
                         DispatchQueue.main.async {
+                            print("Hello")
+                           // self.workItem.cancel()
                             completion(matchData)
                         }
                     }
                    print(matchData)
                     
-                } catch let DecodingError.dataCorrupted(context) {
-                    print(context)
-                } catch let DecodingError.keyNotFound(key, context) {
-                    print("Key '\(key)' not found:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.valueNotFound(value, context) {
-                    print("Value '\(value)' not found:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.typeMismatch(type, context)  {
-                    print("Type '\(type)' mismatch:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch {
-                    print("error: ", error)
+                }
+//                catch let DecodingError.dataCorrupted(context) {
+//                    print(context)
+//                } catch let DecodingError.keyNotFound(key, context) {
+//                    print("Key '\(key)' not found:", context.debugDescription)
+//                    print("codingPath:", context.codingPath)
+//                } catch let DecodingError.valueNotFound(value, context) {
+//                    print("Value '\(value)' not found:", context.debugDescription)
+//                    print("codingPath:", context.codingPath)
+//                } catch let DecodingError.typeMismatch(type, context)  {
+//                    print("Type '\(type)' mismatch:", context.debugDescription)
+//                    print("codingPath:", context.codingPath)
+//                }
+            catch {
+//                    print("error: ", error)
                 }
                 return
             }
@@ -143,7 +227,13 @@ class ApiManager: ObservableObject{
 //            DispatchQueue.main.async {
 //                completion(matchData)
 //            }
-        }.resume()
+        }
+                .resume()
+        }
+//            task.resume()
+//            self.session = task
+//        }
+        DispatchQueue.global().async(execute: workItem)
     }
     
     func loadOdds(gameId:String,completion:@escaping (OddRoot) -> ()) {
@@ -152,43 +242,63 @@ class ApiManager: ObservableObject{
             return
         }
        // print(oddUrl)
-        URLSession.shared.dataTask(with: oddUrl) { data, response, error in
+        workItem = DispatchWorkItem{ URLSession.shared.dataTask(with: oddUrl) { data, response, error in
             if let data = data{
                 do{
                     let odds = try JSONDecoder().decode(OddRoot.self, from: data)
                     if odds.odds.Bet365 != nil{
+                       // DispatchQueue.main
                         DispatchQueue.main.async {
                             completion(odds)
                         }
                     }
                    // print(odds)
                     
-                } catch let DecodingError.dataCorrupted(context) {
+                }
+//                catch let DecodingError.dataCorrupted(context) {
 //                    print(context)
-                } catch let DecodingError.keyNotFound(key, context) {
+//                } catch let DecodingError.keyNotFound(key, context) {
 //                    print("Key '\(key)' not found:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.valueNotFound(value, context) {
+//                } catch let DecodingError.valueNotFound(value, context) {
 //                    print("Value '\(value)' not found:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.typeMismatch(type, context)  {
+//                } catch let DecodingError.typeMismatch(type, context)  {
 //                    print("Type '\(type)' mismatch:", context.debugDescription)
 //                    print("codingPath:", context.codingPath)
-                } catch {
+//                }
+            catch {
 //                    print("error: ", error)
                 }
                 return
             }
         }.resume()
+        }
+        
+        DispatchQueue.global().async(execute: workItem)
         
     }
+    
+    // fetch team data
+    func fetchTeamPast(teamId:String){
+       // self.teamUpcomingRoot = Root()
+        self.teamPastOddArr = []
+        self.teamPastLoading = true
+        self.loadTeamPast(teamId: teamId) { (roots) in
+            self.teamPastRoot = roots
+            print(roots)
+            self.teamPastLoading = false
+        }
+    }
+    
     // fetch team data
     func fetchTeamUpcoming(teamId:String){
-        self.teamUpcomingRoot = Root()
-    //    self.teamOddArr = []
+       // self.teamUpcomingRoot = Root()
+        self.teamOddArr = []
         self.teamLoading = true
         self.loadTeamUpcoming(teamId: teamId) { (roots) in
-            self.teamUpcomingRoot = roots
+            let data = roots
+            self.teamUpcomingRoot = data
             //print(roots)
             self.teamLoading = false
         }
@@ -262,8 +372,21 @@ class ApiManager: ObservableObject{
             ApiManager().loadOdds(gameId:gamesPre[i].game_id){(odds) in
                // self.oddRoot = odds
                 self.teamOddArr.append(NewOdds(gameId: odds.game_id, homeOd: odds.odds.Bet365?.prematch?[0].home_od ?? "N/A", awayOd: odds.odds.Bet365?.prematch?[0].away_od ?? "N/A", drawOd: odds.odds.Bet365?.prematch?[0].draw_od ?? "N/A"))
-                print("Home: \(odds.odds.Bet365?.prematch?[0].home_od ?? "N/A"), Away: \(odds.odds.Bet365?.prematch?[0].away_od ?? "N/A")")
+//                print("Home: \(odds.odds.Bet365?.prematch?[0].home_od ?? "N/A"), Away: \(odds.odds.Bet365?.prematch?[0].away_od ?? "N/A")")
                 self.oddLoading = false
+            }
+        }
+    }
+    
+    // function for fetching odds for the game
+    func fetchTeamPastOdd(gamesEnd: [GamesEnd]){
+        self.oddPastLoading = true
+        for i in 0..<gamesEnd.count{
+            ApiManager().loadOdds(gameId:gamesEnd[i].game_id){(odds) in
+               // self.oddRoot = odds
+                self.teamPastOddArr.append(NewOdds(gameId: odds.game_id, homeOd: odds.odds.Bet365?.prematch?[0].home_od ?? "N/A", awayOd: odds.odds.Bet365?.prematch?[0].away_od ?? "N/A", drawOd: odds.odds.Bet365?.prematch?[0].draw_od ?? "N/A"))
+                print("Home: \(odds.odds.Bet365?.prematch?[0].home_od ?? "N/A"), Away: \(odds.odds.Bet365?.prematch?[0].away_od ?? "N/A")")
+                self.oddPastLoading = false
             }
         }
     }
@@ -271,8 +394,8 @@ class ApiManager: ObservableObject{
     
     func getTeam(){
         teams = []
-        var game = self.root.games_pre
-        var gamePast = self.completedRoot.games_end
+        let game = self.root.games_pre
+        let gamePast = self.completedRoot.games_end
         for i in (isPast ? (0..<completedRoot.games_end.count) : (0..<root.games_pre.count)){
             
             if (self.oddArr.contains(where: {$0.gameId == (isPast ? gamePast[i].game_id : game[i].game_id)})){
@@ -322,11 +445,4 @@ class ApiManager: ObservableObject{
             //return Int((awayChance / totalChance) * 100)
         }
     }
-//
-//    func loadOdds(gamesPre: [GamesPre]) {
-//       for i in 0..<gamesPre.count{
-//          fetchOdd(gameId: gamesPre[i].game_id)
-//       }
-//      print(oddArr)
-//   }
 }

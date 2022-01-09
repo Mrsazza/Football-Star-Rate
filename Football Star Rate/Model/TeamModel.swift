@@ -16,3 +16,4 @@ struct TeamData: Codable, Identifiable{
     var cc: String? = ""
     var chance: Int = 0
 }
+
