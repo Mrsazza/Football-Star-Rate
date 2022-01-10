@@ -11,6 +11,7 @@ struct FavoriteView: View {
     @ObservedObject var api:ApiManager
     @StateObject var teamVM = TeamVM()
     var body: some View {
+        NavigationView{
         ZStack {
             Color.accentColor
             VStack(spacing:0){
@@ -18,6 +19,9 @@ struct FavoriteView: View {
                     List {
                         ForEach(0..<teamVM.favoriteTeam.count, id:\.self){ i in
                                 ZStack {
+                                    NavigationLink(destination: TeamDetailView(api: api, teamId: teamVM.favoriteTeam[i].id, name: teamVM.favoriteTeam[i].name, cc: teamVM.favoriteTeam[i].cc!)){
+                                        EmptyView()}
+                                    
                                     Rectangle()
                                         .foregroundColor( (i % 2 == 0) ? Color.accentColor : Color("DarkBlue"))
                                     .frame(width: nil, height: 90)
@@ -42,12 +46,10 @@ struct FavoriteView: View {
                     }.listStyle(.plain)
                 Spacer()
             }
+            }
+        .navigationBarHidden(true)
         }
     }
-    
-//    func removeRows(at offsets: IndexSet) {
-//       // numbers.remove(atOffsets: offsets)
-//    }
 }
 
 

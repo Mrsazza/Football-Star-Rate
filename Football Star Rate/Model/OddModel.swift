@@ -49,12 +49,6 @@ struct Live:Codable,Identifiable{
     var under_od:String? = ""
 }
 
-//public class Bet365
-//{
-//public List<Prematch> prematch { get; set; }
-//public List<Kickoff> kickoff { get; set; }
-//public List<Live> live { get; set; }
-//}
 
 struct Bet3657:Codable,Identifiable{
     let id = UUID().uuidString
@@ -64,28 +58,6 @@ struct Bet3657:Codable,Identifiable{
 //    var live: [Live] = []
 }
 
-//public class Odds
-//{
-//public Bet365 Bet365 { get; set; }
-//public _10Bet _10Bet { get; set; }
-//public Ladbrokes Ladbrokes { get; set; }
-//public WilliamHill WilliamHill { get; set; }
-//public PlanetWin365 PlanetWin365 { get; set; }
-//public _188Bet _188Bet { get; set; }
-//public UniBet UniBet { get; set; }
-//public BWin BWin { get; set; }
-//public BetFair BetFair { get; set; }
-//public CloudBet CloudBet { get; set; }
-//public Betsson Betsson { get; set; }
-//public SBOBET SBOBET { get; set; }
-//public _888Sport _888Sport { get; set; }
-//public BetAtHome BetAtHome { get; set; }
-//public Marathonbet Marathonbet { get; set; }
-//public BetVictor BetVictor { get; set; }
-//public _1XBet _1XBet { get; set; }
-//public BetRegal BetRegal { get; set; }
-//public CashPoint CashPoint { get; set; }
-//}
 
 struct Odds:Codable, Identifiable{
     let id = UUID().uuidString

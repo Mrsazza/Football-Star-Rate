@@ -42,10 +42,9 @@ struct BottomTabView: View {
                                     } else {
                                         api.fetchOdd(gamesPre: api.root.games_pre)
                                     }
-                                   // print(api.oddRoot)
+                                   
                                     api.getTeam()
                                     onScreen = false
-                                    print(viewRouter.currentPage)
                                 }
                         }
                     }
@@ -57,14 +56,13 @@ struct BottomTabView: View {
                         .onAppear{
                             onScreen = true
                             api.getTeam()
-                            print(viewRouter.currentPage)
+            
                         }
                        
                 case .favorite:
                     FavoriteView(api: api)
                         .onAppear {
                             onScreen = true
-                            print(viewRouter.currentPage)
                         }
                  }
                 VStack(){
